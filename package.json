@@ -20,7 +20,7 @@
         "make:exe": "electron-forge make --targets=@electron-forge/maker-squirrel",
         "make:zip": "electron-forge make --targets=@electron-forge/maker-zip --arch=ia32",
         "make:deb": "electron-forge make --targets=@electron-forge/maker-deb",
-        "make:dmg": "electron-forge make --targets=@electron-forge/maker-dmg --arch=x64",
+        "make:dmg": "electron-forge make --targets=@electron-forge/maker-dmg --arch=arm64",
         "release": "node tagAndPush.js"
     },
     "license": "MIT",

@@ -56,7 +56,6 @@ const config: ForgeConfig = {
         ),
         new MakerDMG(
             {
-                appPath: "./out/Yomikiru-darwin-x64/Yomikiru.app",
             }, 
             ['darwin']
         ),
