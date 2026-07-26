@@ -1791,7 +1791,10 @@ const Settings = (): ReactElement => {
                                                     window.electron.app.getPath("userData"),
                                                     "logs/main.log"
                                                 );
-                                                if (process.platform === "win32")
+                                                if (
+                                                    process.platform === "win32" ||
+                                                    process.platform === "darwin"
+                                                )
                                                     window.electron.shell.showItemInFolder(filePath);
                                                 else if (process.platform === "linux")
                                                     window.electron.ipcRenderer.send("showInExplorer", filePath);

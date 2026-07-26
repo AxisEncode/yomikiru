@@ -110,6 +110,7 @@ const Reader = ({ filter, setFilter }: {
     const readerRef = useRef<HTMLDivElement>(null);
     const imgContRef = useRef<HTMLDivElement>(null);
     const shortcutTextRef = useRef<HTMLDivElement>(null);
+    const enteredFullScreenForZenMode = useRef(false);
 
     const scrollReader = (intensity: number) => {
         if (readerRef.current) {
@@ -200,12 +201,18 @@ const Reader = ({ filter, setFilter }: {
             setSideListPinned(false);
             setWasMaximized(window.electron.getCurrentWindow().isMaximized());
             document.body.classList.add("zenMode");
-            window.electron.getCurrentWindow().setFullScreen(true);
+            enteredFullScreenForZenMode.current = !window.electron.getCurrentWindow().isFullScreen();
+            if (enteredFullScreenForZenMode.current)
+                window.electron.getCurrentWindow().setFullScreen(true);
         } else {
             document.body.classList.remove("zenMode");
             setWasMaximized(false);
-            if (window.electron.getCurrentWindow().isFullScreen())
+            if (
+                enteredFullScreenForZenMode.current &&
+                window.electron.getCurrentWindow().isFullScreen()
+            )
                 window.electron.getCurrentWindow().setFullScreen(false);
+            enteredFullScreenForZenMode.current = false;
         }
     }, [zenMode]);
     /**

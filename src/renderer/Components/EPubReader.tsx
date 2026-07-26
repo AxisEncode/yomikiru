@@ -356,6 +356,7 @@ const EPubReader = () => {
     const readerRef = useRef<HTMLDivElement>(null);
     const mainRef = useRef<HTMLSelectElement>(null);
     const readerSettingExtender = useRef<HTMLButtonElement>(null);
+    const enteredFullScreenForZenMode = useRef(false);
     const sizePlusRef = useRef<HTMLButtonElement>(null);
     const sizeMinusRef = useRef<HTMLButtonElement>(null);
     const fontSizePlusRef = useRef<HTMLButtonElement>(null);
@@ -898,12 +899,18 @@ const EPubReader = () => {
             setSideListPinned(false);
             setWasMaximized(window.electron.getCurrentWindow().isMaximized());
             document.body.classList.add("zenMode");
-            window.electron.getCurrentWindow().setFullScreen(true);
+            enteredFullScreenForZenMode.current = !window.electron.getCurrentWindow().isFullScreen();
+            if (enteredFullScreenForZenMode.current)
+                window.electron.getCurrentWindow().setFullScreen(true);
         } else {
             document.body.classList.remove("zenMode");
             setWasMaximized(false);
-            if (window.electron.getCurrentWindow().isFullScreen())
+            if (
+                enteredFullScreenForZenMode.current &&
+                window.electron.getCurrentWindow().isFullScreen()
+            )
                 window.electron.getCurrentWindow().setFullScreen(false);
+            enteredFullScreenForZenMode.current = false;
         }
     }, [zenMode]);
 

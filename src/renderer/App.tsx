@@ -551,7 +551,8 @@ const App = (): ReactElement => {
                     label: "Show in File Explorer",
                     disabled: url ? false : true,
                     action() {
-                        if (process.platform === "win32") window.electron.shell.showItemInFolder(url || "");
+                        if (process.platform === "win32" || process.platform === "darwin")
+                            window.electron.shell.showItemInFolder(url || "");
                         else if (process.platform === "linux")
                             window.electron.ipcRenderer.send("showInExplorer", url);
                     },

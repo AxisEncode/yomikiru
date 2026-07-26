@@ -20,8 +20,20 @@ const TopBar = (): ReactElement => {
     const mangaInReader = useAppSelector((store) => store.mangaInReader);
     const bookInReader = useAppSelector((store) => store.bookInReader);
     const [isMaximized, setMaximized] = useState(window.electron.getCurrentWindow().isMaximized ?? true);
+    const [isFullScreen, setIsFullScreen] = useState(
+        window.electron.getCurrentWindow().isFullScreen()
+    );
     const isReaderOpen = useAppSelector((store) => store.isReaderOpen);
     const appSettings = useAppSelector((store) => store.appSettings);
+    const maximizeTogglesFullScreen = process.platform === "darwin";
+    const maximizeRestoreIcon =
+        maximizeTogglesFullScreen ? (
+            isFullScreen ? faWindowRestore : faWindowMaximize
+        ) : !isMaximized ? (
+            faWindowMaximize
+        ) : (
+            faWindowRestore
+        );
 
     const [pageScrollTimeoutID, setTimeoutID] = useState<NodeJS.Timeout | null>(null);
 
@@ -65,6 +77,8 @@ const TopBar = (): ReactElement => {
         setMaximized(window.electron.getCurrentWindow().isMaximized);
         window.electron.getCurrentWindow()?.on("maximize", () => setMaximized(true));
         window.electron.getCurrentWindow()?.on("unmaximize", () => setMaximized(false));
+        window.electron.getCurrentWindow()?.on("enter-full-screen", () => setIsFullScreen(true));
+        window.electron.getCurrentWindow()?.on("leave-full-screen", () => setIsFullScreen(false));
 
         const onBlur = () => {
             setSysBtnColor(true);
@@ -80,6 +94,8 @@ const TopBar = (): ReactElement => {
     const removeEventListener = () => {
         window.electron.getCurrentWindow()?.removeAllListeners("maximize");
         window.electron.getCurrentWindow()?.removeAllListeners("unmaximize");
+        window.electron.getCurrentWindow()?.removeAllListeners("enter-full-screen");
+        window.electron.getCurrentWindow()?.removeAllListeners("leave-full-screen");
         window.electron.getCurrentWindow()?.removeAllListeners("focus");
         window.electron.getCurrentWindow()?.removeAllListeners("blur");
     };
@@ -279,13 +295,27 @@ const TopBar = (): ReactElement => {
                             tabIndex={-1}
                             id="maximizeRestoreBtn"
                             onFocus={(e) => e.currentTarget.blur()}
-                            title={isMaximized ? "Restore" : "Maximize"}
+                            title={
+                                maximizeTogglesFullScreen
+                                    ? isFullScreen
+                                        ? "Exit Full Screen"
+                                        : "Full Screen"
+                                    : isMaximized
+                                    ? "Restore"
+                                    : "Maximize"
+                            }
                             onClick={() => {
+                                if (maximizeTogglesFullScreen) {
+                                    window.electron
+                                        .getCurrentWindow()
+                                        .setFullScreen(!window.electron.getCurrentWindow().isFullScreen());
+                                    return;
+                                }
                                 if (isMaximized) return window.electron.getCurrentWindow().restore();
                                 window.electron.getCurrentWindow().maximize();
                             }}
                         >
-                            <FontAwesomeIcon icon={isMaximized ? faWindowRestore : faWindowMaximize} />
+                            <FontAwesomeIcon icon={maximizeRestoreIcon} />
                         </button>
                         <button
                             tabIndex={-1}
