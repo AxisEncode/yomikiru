@@ -319,6 +319,7 @@ const App = (): ReactElement => {
     };
 
     const closeReader = () => {
+        const wasInZenMode = document.body.classList.contains("zenMode");
         if (window.app.linkInReader && window.app.linkInReader.type === "image")
             dispatch(updateCurrentHistoryPage());
         if (window.app.linkInReader && window.app.linkInReader.type === "book")
@@ -346,7 +347,7 @@ const App = (): ReactElement => {
             );
 
         document.body.classList.remove("zenMode");
-        if (window.electron.getCurrentWindow().isFullScreen())
+        if (wasInZenMode && window.electron.getCurrentWindow().isFullScreen())
             window.electron.getCurrentWindow().setFullScreen(false);
         setTimeout(() => {
             window.electron.webFrame.clearCache();
@@ -449,9 +450,9 @@ const App = (): ReactElement => {
             };
             switch (true) {
                 case i(shortcutsMapped["navToHome"]):
+                    if (window.app.isReaderOpen) return closeReader();
                     if (window.electron.getCurrentWindow().isFullScreen())
                         window.electron.getCurrentWindow().setFullScreen(false);
-                    if (window.app.isReaderOpen) return closeReader();
                     window.location.reload();
                     break;
                 case i(shortcutsMapped["openSettings"]):
